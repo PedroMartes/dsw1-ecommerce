@@ -3,11 +3,12 @@
 import Link from "next/link";
 import styles from "./header.module.css";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation"; // Importe isso
+import { usePathname } from "next/navigation";
+import { FiShoppingCart } from "react-icons/fi"; // Importando o ícone
 
 export default function Header() {
     const [user, setUser] = useState<{ name: string; role: string } | null>(null);
-    const pathname = usePathname(); // Toda vez que a URL mudar, o header vai rodar esse código
+    const pathname = usePathname();
 
     useEffect(() => {
         const savedUser = localStorage.getItem("zetta-user");
@@ -16,20 +17,13 @@ export default function Header() {
         } else {
             setUser(null);
         }
-    }, [pathname]); // <-- O segredo está aqui: re-executa ao mudar de página
+    }, [pathname]);
 
     const handleLogout = async () => {
         try {
-            // 1. Avisa o servidor para limpar o Cookie
             await fetch("/api/auth/logout", { method: "POST" });
-
-            // 2. Limpa o localStorage (que usamos para o nome do usuário no Header)
             localStorage.removeItem("zetta-user");
-
-            // 3. Limpa o estado local para o Header atualizar visualmente na hora
             setUser(null);
-
-            // 4. Manda o usuário para a Home
             window.location.href = "/";
         } catch (error) {
             console.error("Erro ao sair:", error);
@@ -57,6 +51,10 @@ export default function Header() {
                 <nav className={styles.navAdminButtons}>
                     <Link href="/" className={styles.firstPage}>Página Inicial</Link>
                     <Link href="/admin/home" className={styles.firstPage}>Controle</Link>
+                    {/* Botão de Carrinho para Admin (Opcional) */}
+                    <Link href="/client/carrinho" className={styles.cartIconLink}>
+                        <FiShoppingCart size={22} />
+                    </Link>
                     <button onClick={handleLogout} className={styles.logoutBtn}>Sair</button>
                 </nav>
             </header>
@@ -68,10 +66,14 @@ export default function Header() {
         <header className={styles.header}>
             <Link href="/" className={styles.logo}>ZETTA</Link>
             <nav className={styles.navNameOut}>
-                <span>Olá, {user.name}</span>
+                {/* BOTÃO DO CARRINHO */}
+                <Link href="/client/carrinho" className={styles.cartIconLink} title="Meu Carrinho">
+                    <FiShoppingCart size={24} />
+                </Link>
+                
+                <span className={styles.userName}>Olá, {user.name}</span>
                 <button onClick={handleLogout} className={styles.logoutBtn}>Sair</button>
             </nav>
         </header>
     );
 };
-

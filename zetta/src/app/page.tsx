@@ -1,6 +1,7 @@
 import { prisma } from "../lib/prisma";
 import styles from "./home.module.css";
 import Link from "next/link";
+import HomeCarousel from "../components/HomeCarousel"; // Importe o carrossel
 
 export default async function HomePage() {
   const products = await prisma.product.findMany({
@@ -11,6 +12,9 @@ export default async function HomePage() {
 
   return (
     <main className={styles.container}>
+      {/* --- NOVA SEÇÃO: CARROSSEL MESTRE --- */}
+      <HomeCarousel />
+
       <h1 className={styles.title}>Explore Nossos Eletrônicos</h1>
 
       <div className={styles.grid}>
@@ -20,7 +24,6 @@ export default async function HomePage() {
           </p>
         ) : (
           products.map((product) => (
-            /* Ajustado para a nova rota de cliente */
             <Link 
               href={`/item/${product.id}`} 
               key={product.id} 

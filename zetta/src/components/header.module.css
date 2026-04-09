@@ -75,3 +75,38 @@
   display: flex;
   gap: 1rem;
 }
+
+.navNameOut {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.cartIconLink {
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s, transform 0.2s;
+    position: relative;
+}
+
+.cartIconLink:hover {
+    color: #60a5fa; /* Azul Zetta */
+    transform: scale(1.1);
+}
+
+.userName {
+    font-weight: 500;
+    color: #cbd5e1;
+}
+
+/* Para o Admin */
+.navAdminButtons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.adminBg .cartIconLink:hover {
+    color: #fbbf24; /* Amarelo/Dourado para combinar com Admin se desejar */
+}
