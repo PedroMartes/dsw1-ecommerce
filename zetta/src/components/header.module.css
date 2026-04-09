@@ -1,0 +1,77 @@
+.adminBg {
+    background-color: #1e1b4b !important;
+    /* Um tom de roxo/azul bem escuro para o Admin */
+    border-bottom: 2px solid #ef4444;
+    /* Linha vermelha para indicar "Modo Perigoso/Admin" */
+}
+
+.badge {
+    font-size: 0.7rem;
+    background-color: #ef4444;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+.logoutBtn {
+    background: none;
+    border: 1px solid #4b5563;
+    color: #94a3b8;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.logoutBtn:hover {
+    background-color: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e293b;
+    padding: 1rem;
+}
+
+.logo {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #3b82f6;
+    text-transform: uppercase;
+}
+
+.navRegisterLogin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.loginBtn, .registerBtn, .firstPage {
+    padding: 0.5rem 1.5rem;
+    background-color: transparent;
+    border: 1px solid #3b82f6;
+    color: #3b82f6;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.loginBtn:hover, .registerBtn:hover, .firstPage:hover {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.navNameOut button {
+    margin-left: 1rem;
+}
+
+.navAdminButtons {
+  display: flex;
+  gap: 1rem;
+}

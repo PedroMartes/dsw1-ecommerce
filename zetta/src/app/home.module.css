@@ -1,0 +1,106 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: white;
+}
+
+.title {
+  font-size: 2rem;
+  font-bold: bold;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: #60a5fa; /* Azul ZETTA */
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  background-color: #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.imageContainer {
+  width: 100%;
+  height: 200px;
+  background-color: #0f172a;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-grow: 1;
+}
+
+.productName {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #f8fafc;
+}
+
+.price {
+  font-size: 1.5rem;
+  color: #10b981; /* Verde para o preço */
+  font-weight: 800;
+}
+
+.stock {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.buyButton {
+  margin-top: 1rem;
+  background-color: #2563eb;
+  color: white;
+  padding: 0.8rem;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.buyButton:hover {
+  background-color: #1d4ed8;
+}
+
+/* Remove a estilização padrão de link do card */
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block; /* Garante que o link ocupe todo o espaço do card */
+}
+
+/* Opcional: Efeito de hover para o usuário saber que é clicável */
+.card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
