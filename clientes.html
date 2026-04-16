@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/global.css">
+    <title>Zetta ADM - Clientes</title>
+</head>
+
+<body>
+    <script src="js/auth_check.js"></script>
+    <script>checkAccess('admin');</script>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">ZETTA.ADM</div>
+            <button onclick="logout()" class="btn-logout">Sair</button>
+        </header>
+
+        <aside class="sidebar">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="admin-produtos.html">Produtos</a></li>
+                <li><a href="clientes.html" class="active">Clientes</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h2>Usuários Cadastrados</h2>
+            <div id="tabela-clientes" style="margin-top:20px; background:#1a1a1a; border-radius:8px; border:1px solid #333; overflow:hidden;">
+                <table style="width:100%; border-collapse:collapse; color:white; text-align:left;">
+                    <thead style="background:#222; color:#888; font-size:12px; text-transform:uppercase;">
+                        <tr>
+                            <th style="padding:15px;">ID</th>
+                            <th style="padding:15px;">Nome</th>
+                            <th style="padding:15px;">Email</th>
+                            <th style="padding:15px;">Nível</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-usuarios">
+                        <tr><td colspan="4" style="padding:15px; text-align:center; color:#888;">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        async function carregarUsuarios() {
+            const tbody = document.getElementById('lista-usuarios');
+            try {
+                const data = await fetchData('usuarios.php');
+                
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='4' style='padding:15px; text-align:center;'>Nenhum cliente encontrado na tabela 'clientes'.</td></tr>";
+                    return;
+                }
+
+                tbody.innerHTML = "";
+                data.forEach(u => {
+                    const corNivel = u.nivel === 'admin' ? '#3399ff' : '#888';
+                    tbody.innerHTML += `
+                        <tr style="border-bottom:1px solid #222;">
+                            <td style="padding:15px;">${u.id}</td>
+                            <td style="padding:15px;">${u.nome}</td>
+                            <td style="padding:15px;">${u.email}</td>
+                            <td style="padding:15px;"><span style="color:${corNivel}">${u.nivel}</span></td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                tbody.innerHTML = "<tr><td colspan='4' style='padding:15px; text-align:center; color:red;'>Erro ao conectar com a API.</td></tr>";
+            }
+        }
+
+        carregarUsuarios();
+    </script>
+</body>
+
+</html>

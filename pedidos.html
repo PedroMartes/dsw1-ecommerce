@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/pedidos.css">
+    <title>Zetta Store - Meus Pedidos</title>
+</head>
+
+<body>
+    <script src="js/auth_check.js"></script>
+    <script>checkAccess('cliente');</script>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">ZETTA</div>
+            <div class="user-info">
+                <span id="u-display"></span>
+                <button onclick="logout()" class="btn-logout">Sair</button>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="index.html">Produtos</a></li>
+                <li><a href="carrinho.html">Meu Carrinho</a></li>
+                <li><a href="pedidos.html" class="active">Meus Pedidos</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h2 style="margin-bottom: 20px;">Histórico de Pedidos</h2>
+
+            <div id="pedidos-container" class="pedidos-container">
+                <p style="color: #666; text-align: center; padding: 20px;">Carregando seu histórico de compras...</p>
+            </div>
+        </main>
+
+        <footer class="footer">Zetta Store &copy; 2026</footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Exibe o nome do usuário no topo
+        if (user) {
+            document.getElementById('u-display').innerText = `Olá, ${user.nome}`;
+        }
+
+        async function carregarPedidos() {
+            const container = document.getElementById('pedidos-container');
+
+            try {
+                // Busca os pedidos filtrando pelo ID do usuário logado
+                // Certifique-se que o pedidos.php aceite o parâmetro usuario_id
+                const pedidos = await fetchData(`pedidos.php?usuario_id=${user.id}`);
+
+                if (!pedidos || pedidos.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align:center; padding: 60px 20px; background: #1a1a1a; border-radius: 8px; border: 1px solid #333;">
+                            <p style="color: #888; margin-bottom: 20px;">Você ainda não realizou nenhuma compra.</p>
+                            <a href="index.html" style="padding: 10px 20px; background: #3399ff; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">VER PRODUTOS</a>
+                        </div>`;
+                    return;
+                }
+
+                container.innerHTML = "";
+
+                // Inverte a ordem para mostrar os mais recentes primeiro
+                pedidos.reverse().forEach(p => {
+                    // Trata a data (ajusta se vier nula ou formato diferente)
+                    const dataObj = p.data_pedido ? new Date(p.data_pedido) : new Date();
+                    const dataFormatada = dataObj.toLocaleDateString('pt-BR');
+
+                    const precoTotal = parseFloat(p.total).toLocaleString('pt-br', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    });
+
+                    container.innerHTML += `
+                        <div class="pedido-box" style="background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                            <div class="pedido-header" style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px;">
+                                <span style="font-weight: bold; color: #fff;">Pedido #${p.id}</span>
+                                <span class="status-badge" style="background: #28a745; color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; text-transform: uppercase;">
+                                    ${p.status || 'Concluído'}
+                                </span>
+                            </div>
+                            <div style="font-size: 14px; color: #bbb;">
+                                <p style="margin-bottom: 8px;"><strong>Data da Compra:</strong> ${dataFormatada}</p>
+                                <p style="margin-bottom: 8px;"><strong>Itens:</strong> <span style="color: #eee;">${p.itens}</span></p>
+                            </div>
+                            <div style="text-align: right; margin-top: 15px; font-size: 18px; color: #3399ff; font-weight: bold;">
+                                Total: ${precoTotal}
+                            </div>
+                        </div>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Erro ao carregar histórico:", error);
+                container.innerHTML = `
+                    <div style="text-align: center; color: #ff4444; padding: 20px;">
+                        Erro ao conectar com o servidor. Verifique sua conexão.
+                    </div>`;
+            }
+        }
+
+        carregarPedidos();
+    </script>
+</body>
+
+</html>

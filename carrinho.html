@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/carrinho.css">
+    <title>Zetta Store - Carrinho</title>
+</head>
+
+<body>
+    <script src="js/auth_check.js"></script>
+    <script>checkAccess('cliente');</script>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">ZETTA</div>
+            <div class="user-info">
+                <span id="u-disp"></span>
+                <button onclick="logout()" class="btn-logout">Sair</button>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="index.html">Produtos</a></li>
+                <li><a href="carrinho.html" class="active">Meu Carrinho</a></li>
+                <li><a href="pedidos.html">Meus Pedidos</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>Seu Carrinho</h2>
+                <button onclick="location.href='index.html'"
+                    style="padding:10px 20px; background:transparent; color:#3399ff; border:1px solid #3399ff; border-radius:4px; cursor:pointer; font-weight:bold;">
+                    Continuar Comprando
+                </button>
+            </div>
+
+            <div id="carrinho-vazio-msg" style="display:none; margin-top:40px; text-align:center; color:#666;">
+                <p style="font-size: 18px;">Seu carrinho está vazio.</p>
+                <a href="index.html" style="color: #3399ff; text-decoration: none;">Que tal ver alguns produtos?</a>
+            </div>
+
+            <div class="cart-layout" id="cart-wrapper" style="margin-top: 20px;">
+                <div class="cart-items" id="lista-carrinho">
+                    </div>
+
+                <div class="cart-summary" id="area-total">
+                    <h3>Resumo do Pedido</h3>
+                    <div style="display:flex; justify-content:space-between; color:#bbb; margin: 20px 0;">
+                        <span>Subtotal</span>
+                        <span id="valor-total" style="color: #3399ff; font-weight: bold; font-size: 20px;">R$ 0,00</span>
+                    </div>
+                    <button onclick="location.href='checkout.html'" class="btn-checkout" style="width: 100%;">
+                        FINALIZAR COMPRA
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">Zetta Store &copy; 2026</footer>
+    </div>
+
+    <script src="js/cart.js"></script>
+    <script>
+        document.getElementById('u-disp').innerText = `Olá, ${user.nome}`;
+
+        function renderizarCarrinho() {
+            const cart = getCart();
+            const listaDiv = document.getElementById('lista-carrinho');
+            const wrapper = document.getElementById('cart-wrapper');
+            const msgVazio = document.getElementById('carrinho-vazio-msg');
+
+            listaDiv.innerHTML = "";
+
+            if (cart && cart.length > 0) {
+                wrapper.style.display = 'grid';
+                msgVazio.style.display = 'none';
+                let total = 0;
+
+                cart.forEach((item, index) => {
+                    const precoNumerico = parseFloat(item.preco);
+                    total += precoNumerico;
+
+                    listaDiv.innerHTML += `
+                        <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333;">
+                            <div class="item-info" style="display: flex; align-items: center; gap: 20px;">
+                                <div style="width: 80px; height: 80px; background: #000; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                    <img src="${item.imagem}" alt="${item.nome}" style="width: 100%; height: 100%; object-fit: contain;">
+                                </div>
+                                <div>
+                                    <span style="color: #fff; font-weight: bold; display: block;">${item.nome}</span>
+                                    <span style="color: #666; font-size: 13px;">Unidade: R$ ${precoNumerico.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <div class="item-actions" style="text-align: right;">
+                                <span class="item-price" style="display: block; color: #3399ff; font-weight: bold; margin-bottom: 10px;">R$ ${precoNumerico.toFixed(2)}</span>
+                                <button onclick="remover(${index})" class="btn-remove" style="color: #ff4444; background: transparent; border: none; cursor: pointer; font-size: 13px;">Remover</button>
+                            </div>
+                        </div>`;
+                });
+                document.getElementById('valor-total').innerText = `R$ ${total.toFixed(2)}`;
+            } else {
+                wrapper.style.display = 'none';
+                msgVazio.style.display = 'block';
+            }
+        }
+
+        // Função auxiliar para remover e atualizar a tela
+        function remover(index) {
+            removerDoCarrinho(index);
+            renderizarCarrinho();
+        }
+
+        renderizarCarrinho();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+/* Layout da página de cadastro */
+.cadastro-page {
+    grid-template-areas: 
+        "header"
+        "content"
+        "footer";
+    grid-template-columns: 1fr;
+    height: 100vh;
+}
+
+.content-cadastro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Card de Cadastro */
+.cadastro-card {
+    background: #1a1a1a;
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.cadastro-card h2 {
+    color: #3399ff; /* Azul Zetta */
+    text-align: center;
+    font-size: 26px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+/* Campos de entrada */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    color: #aaa;
+    font-size: 12px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.cadastro-card input {
+    width: 100%;
+    padding: 12px 15px;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    color: white;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.cadastro-card input:focus {
+    border-color: #3399ff;
+    outline: none;
+    box-shadow: 0 0 8px rgba(51, 153, 255, 0.2);
+}
+
+/* Botão */
+.btn-cadastro {
+    width: 100%;
+    padding: 15px;
+    background: #3399ff; /* Padronizado com o login */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.3s, transform 0.2s;
+    margin-top: 10px;
+}
+
+.btn-cadastro:hover {
+    background: #2673c2;
+    transform: translateY(-2px);
+}
+
+/* Links */
+.footer-link {
+    text-align: center;
+    margin-top: 25px;
+    color: #888;
+    font-size: 14px;
+}
+
+.footer-link a {
+    color: #3399ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.footer-link a:hover {
+    text-decoration: underline;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+    .cadastro-card {
+        padding: 25px;
+    }
+}

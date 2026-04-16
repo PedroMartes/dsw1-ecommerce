@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/checkout.css">
+    <title>Zetta Store - Finalizar Compra</title>
+</head>
+
+<body>
+    <script src="js/auth_check.js"></script>
+    <script>checkAccess('cliente');</script>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">ZETTA</div>
+            <div class="user-info">
+                <span id="u-display"></span>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="index.html">Produtos</a></li>
+                <li><a href="carrinho.html">Meu Carrinho</a></li>
+                <li><a href="pedidos.html">Meus Pedidos</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="checkout-card">
+                <div class="checkout-header">
+                    <h3>Finalizar Pedido</h3>
+                    <p>Preencha os dados abaixo para concluir a sua compra.</p>
+                </div>
+
+                <div class="info-total" id="info-total"></div>
+
+                <form id="payForm" class="checkout-form">
+                    <div class="form-group">
+                        <label for="endereco">Endereço de Entrega</label>
+                        <input type="text" id="endereco" name="endereco"
+                            placeholder="Ex: Av. Paulista, 1000 - São Paulo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="metodo">Forma de Pagamento</label>
+                        <select id="metodo" name="metodo">
+                            <option value="pix">PIX (Aprovação imediata)</option>
+                            <option value="cartao">Cartão de Crédito</option>
+                            <option value="boleto">Boleto Bancário</option>
+                        </select>
+                    </div>
+
+                    <div class="checkout-actions">
+                        <button type="submit" id="btn-finalizar" class="btn-finalizar">CONFIRMAR PEDIDO</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <footer class="footer">Zetta Store &copy; 2026</footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        if (user) {
+            document.getElementById('u-display').innerText = `Finalizando como: ${user.nome}`;
+        }
+
+        const cart = getCart();
+        const total = cart.reduce((acc, item) => acc + parseFloat(item.preco || 0), 0);
+        const infoDiv = document.getElementById('info-total');
+        const submitBtn = document.getElementById('btn-finalizar');
+
+        if (cart.length > 0) {
+            infoDiv.innerHTML = `
+                <span class="label">Total a pagar:</span>
+                <span class="value">R$ ${total.toFixed(2)}</span>
+                <span class="items">${cart.length} itens no carrinho</span>
+            `;
+        } else {
+            infoDiv.innerHTML = `<span class="label" style="color: #ff4444;">Seu carrinho está vazio!</span>`;
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = "0.5";
+            submitBtn.style.cursor = "not-allowed";
+        }
+
+        document.getElementById('payForm').onsubmit = async (e) => {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "PROCESSANDO...";
+
+            const nomesProdutos = cart.map(i => i.nome).join(', ');
+
+            const dados = {
+                usuario_id: user.id,
+                usuario_nome: user.nome,
+                total: total,
+                itens: nomesProdutos,
+                endereco: e.target.endereco.value,
+                metodo_pagamento: e.target.metodo.value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/pedidos.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+
+                if (res.ok) {
+                    alert("✅ Pedido realizado com sucesso!");
+                    limparCarrinho();
+                    location.href = 'pedidos.html';
+                } else {
+                    alert("❌ Erro ao processar pedido no servidor.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "CONFIRMAR PEDIDO";
+                }
+            } catch (error) {
+                alert("❌ Erro de conexão com a API.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "CONFIRMAR PEDIDO";
+            }
+        };
+    </script>
+</body>
+
+</html>

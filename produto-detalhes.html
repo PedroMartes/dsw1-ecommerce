@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <title>Zetta Store - Detalhes do Produto</title>
+    <style>
+        .detalhes-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 60px; 
+            margin-top: 20px; 
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+        /* Ajuste para Base64 não distorcer */
+        .product-img-big { 
+            width: 100%; 
+            max-height: 450px; 
+            object-fit: contain; 
+            background: #000;
+            border-radius: 8px;
+        }
+        .price-tag { font-size: 32px; color: #3399ff; font-weight: bold; margin: 20px 0; }
+        .description-text { color: #bbb; line-height: 1.8; margin-bottom: 30px; font-size: 16px; white-space: pre-line; }
+        
+        /* Seção de Relacionados */
+        .relacionados-section { margin-top: 60px; border-top: 1px solid #333; padding-top: 40px; }
+        .relacionados-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 20px; 
+            margin-top: 20px; 
+        }
+        .card-relacionado { 
+            background: #1a1a1a; 
+            padding: 15px; 
+            border-radius: 8px; 
+            border: 1px solid #333; 
+            text-align: center;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .card-relacionado:hover { border-color: #3399ff; transform: translateY(-5px); }
+        .card-relacionado img { width: 100%; height: 120px; object-fit: contain; margin-bottom: 10px; background: #000; border-radius: 4px; }
+        .card-relacionado h5 { color: white; margin: 10px 0; font-size: 14px; height: 32px; overflow: hidden; }
+        .card-relacionado span { color: #3399ff; font-weight: bold; }
+
+        @media (max-width: 768px) {
+            .detalhes-grid { grid-template-columns: 1fr; gap: 30px; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <script src="js/auth_check.js"></script>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">ZETTA</div>
+            <div id="auth-header" class="user-info"></div>
+        </header>
+
+        <aside class="sidebar">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="index.html">Voltar à Loja</a></li>
+                <li><a href="carrinho.html">Meu Carrinho</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div id="produto-info" class="detalhes-grid">
+                </div>
+
+            <div class="relacionados-section">
+                <h3>Produtos que você pode gostar</h3>
+                <div id="lista-relacionados" class="relacionados-grid">
+                    </div>
+            </div>
+        </main>
+
+        <footer class="footer">Zetta Store &copy; 2026</footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const produtoId = urlParams.get('id');
+        let produtoAtual = null; // Armazena o objeto para o carrinho
+
+        // 1. Carregar Produto Principal
+        fetchData(`produtos.php?id=${produtoId}`).then(p => {
+            if(!p) {
+                document.getElementById('produto-info').innerHTML = "<h2>Produto não encontrado.</h2>";
+                return;
+            }
+            
+            produtoAtual = p; // Guarda os dados para a função de compra
+            const container = document.getElementById('produto-info');
+            
+            container.innerHTML = `
+                <div>
+                    <img src="${p.imagem}" class="product-img-big" alt="${p.nome}">
+                </div>
+                <div>
+                    <h2 style="font-size: 28px; color: #fff;">${p.nome}</h2>
+                    <p class="price-tag">R$ ${parseFloat(p.preco).toFixed(2)}</p>
+                    <div class="description-text">${p.descricao || 'Sem descrição disponível.'}</div>
+                    <button id="btn-comprar"
+                        style="padding:15px 30px; background:#3399ff; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; width:100%; font-size:16px; transition: 0.3s;">
+                        ADICIONAR AO CARRINHO
+                    </button>
+                </div>
+            `;
+
+            // Atribui o evento de clique de forma limpa
+            document.getElementById('btn-comprar').addEventListener('click', () => {
+                validarCompra(produtoAtual);
+            });
+
+            // 2. Carregar Relacionados
+            carregarRelacionados(p.id);
+        });
+
+        async function carregarRelacionados(atualId) {
+            const todos = await fetchData('produtos.php');
+            const listaDiv = document.getElementById('lista-relacionados');
+            
+            // Filtra e pega até 4 itens
+            const filtrados = todos.filter(item => item.id != atualId).slice(0, 4);
+
+            if(filtrados.length === 0) {
+                document.querySelector('.relacionados-section').style.display = 'none';
+                return;
+            }
+
+            filtrados.forEach(item => {
+                listaDiv.innerHTML += `
+                    <a href="produto-detalhes.html?id=${item.id}" class="card-relacionado">
+                        <img src="${item.imagem}">
+                        <h5>${item.nome}</h5>
+                        <span>R$ ${parseFloat(item.preco).toFixed(2)}</span>
+                    </a>
+                `;
+            });
+        }
+
+        function validarCompra(produto) {
+            if (!user) {
+                alert("Você precisa fazer login para adicionar itens ao carrinho!");
+                window.location.href = 'login.html';
+            } else {
+                adicionarAoCarrinho(produto);
+                alert("🛒 Produto adicionado ao carrinho!");
+            }
+        }
+
+        // Header Dinâmico
+        const authHeader = document.getElementById('auth-header');
+        if (user) {
+            authHeader.innerHTML = `<span>Olá, ${user.nome}</span> <button onclick="logout()" class="btn-logout">Sair</button>`;
+        } else {
+            authHeader.innerHTML = `<button onclick="location.href='login.html'" style="background:#3399ff; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">Entrar</button>`;
+        }
+    </script>
+</body>
+</html>

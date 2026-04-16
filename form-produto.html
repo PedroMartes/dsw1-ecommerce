@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <title>Zetta ADM - Cadastro de Produto</title>
+</head>
+
+<body>
+    <script src="js/auth_check.js"></script>
+    <script>checkAccess('admin');</script>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">ZETTA.ADM</div>
+            <div class="user-info">
+                <span>Painel Administrativo</span>
+                <button onclick="logout()" class="btn-logout">Sair</button>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <h3>Gestão</h3>
+            <ul>
+                <li><a href="admin-produtos.html">Voltar aos Produtos</a></li>
+            </ul>
+        </aside>
+
+        <main class="content" style="display:flex; justify-content:center;">
+            <form id="formProduto"
+                style="background:#1a1a1a; padding:30px; border-radius:8px; border:1px solid #333; width:100%; max-width:600px;">
+                <h2 id="titulo-form">Novo Produto</h2>
+
+                <label
+                    style="display:block; margin: 15px 0 5px; color:#666; font-size:12px; text-transform:uppercase;">Nome</label>
+                <input type="text" id="nome" required
+                    style="width:100%; padding:12px; background:#000; border:1px solid #333; color:white; border-radius:4px;">
+
+                <label
+                    style="display:block; margin: 15px 0 5px; color:#666; font-size:12px; text-transform:uppercase;">Preço
+                    (R$)</label>
+                <input type="number" step="0.01" id="preco" required
+                    style="width:100%; padding:12px; background:#000; border:1px solid #333; color:white; border-radius:4px;">
+
+                <label
+                    style="display:block; margin: 15px 0 5px; color:#666; font-size:12px; text-transform:uppercase;">Imagem
+                    do Produto</label>
+                <input type="file" id="imagem-file" accept="image/*"
+                    style="width:100%; padding:12px; background:#000; border:1px solid #333; color:white; border-radius:4px;">
+
+                <div id="preview-container" style="margin-top: 15px; text-align: center;">
+                    <img id="img-preview" src=""
+                        style="max-width: 200px; display: none; border-radius: 4px; border: 1px solid #333;">
+                </div>
+
+                <label
+                    style="display:block; margin: 15px 0 5px; color:#666; font-size:12px; text-transform:uppercase;">Descrição
+                    do Produto</label>
+                <textarea id="descricao" required
+                    style="width:100%; padding:12px; background:#000; border:1px solid #333; color:white; border-radius:4px; height:120px; resize:vertical;"></textarea>
+
+                <button type="submit"
+                    style="width:100%; padding:15px; background:#3399ff; color:white; border:none; cursor:pointer; font-weight:bold; margin-top:25px; border-radius:4px;">
+                    SALVAR PRODUTO
+                </button>
+            </form>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const produtoId = urlParams.get('id');
+        const fileInput = document.getElementById('imagem-file');
+        const imgPreview = document.getElementById('img-preview');
+
+        let imagemBase64 = "";
+
+        // Converte arquivo para Base64
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                imagemBase64 = await toBase64(file);
+                imgPreview.src = imagemBase64;
+                imgPreview.style.display = "inline-block";
+            }
+        });
+
+        // Carregar dados se for EDITAR
+        if (produtoId) {
+            document.getElementById('titulo-form').innerText = "Editar Produto";
+            fetchData(`produtos.php?id=${produtoId}`).then(p => {
+                if (p) {
+                    document.getElementById('nome').value = p.nome;
+                    document.getElementById('preco').value = p.preco;
+                    document.getElementById('descricao').value = p.descricao || '';
+                    if (p.imagem) {
+                        imagemBase64 = p.imagem;
+                        imgPreview.src = p.imagem;
+                        imgPreview.style.display = "inline-block";
+                    }
+                }
+            });
+        }
+
+        document.getElementById('formProduto').onsubmit = async (e) => {
+            e.preventDefault();
+
+            if (!imagemBase64) {
+                alert("Selecione uma imagem!");
+                return;
+            }
+
+            const produto = {
+                id: produtoId || null,
+                nome: document.getElementById('nome').value,
+                preco: document.getElementById('preco').value,
+                descricao: document.getElementById('descricao').value,
+                imagem: imagemBase64
+            };
+
+            try {
+                // Usamos POST tanto para criar quanto para editar (o PHP decide pelo ID)
+                const response = await fetch(`${API_BASE}/produtos.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(produto)
+                });
+
+                const res = await response.json();
+                if (res.status === "sucesso") {
+                    alert("✅ Produto salvo!");
+                    window.location.href = 'admin-produtos.html';
+                } else {
+                    alert("❌ Erro: " + res.message);
+                }
+            } catch (error) {
+                alert("❌ Erro de conexão.");
+            }
+        };
+
+        function logout() {
+            localStorage.removeItem('user');
+            location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,130 @@
+
+.checkout-card {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+}
+
+.checkout-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.checkout-header h3 {
+    color: #3399ff;
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+}
+
+.checkout-header p {
+    color: #777;
+    font-size: 14px;
+}
+
+/* Bloco de Resumo de Preço */
+.info-total {
+    background: #0a0a0a;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #3399ff;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-total .label {
+    color: #555;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.info-total .value {
+    color: #3399ff;
+    font-size: 30px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.info-total .items {
+    color: #444;
+    font-size: 13px;
+}
+
+/* Campos do Formulário */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #999;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.checkout-form input, 
+.checkout-form select {
+    width: 100%;
+    padding: 12px;
+    background: #000;
+    border: 1px solid #333;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.checkout-form input:focus {
+    border-color: #3399ff;
+    outline: none;
+}
+
+/* Ações e Botões */
+.checkout-actions {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-finalizar {
+    width: 100%;
+    padding: 16px;
+    background: #3399ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-finalizar:hover {
+    background: #2673c2;
+}
+
+.btn-cancelar {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: #666;
+    border: 1px solid #333;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-cancelar:hover {
+    color: #ff4444;
+    border-color: #ff4444;
+    background: rgba(255, 68, 68, 0.05);
+}

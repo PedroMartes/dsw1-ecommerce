@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <title>Zetta ADM - Gestão de Produtos</title>
+</head>
+
+<body>
+    <script src="js/auth_check.js"></script>
+    <script>checkAccess('admin');</script>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">ZETTA.ADM</div>
+            <div class="user-info">
+                <span>Gestor: <strong style="color:#fff;" id="a-name"></strong></span>
+                <button onclick="logout()" class="btn-logout">Sair</button>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <h3>Menu Administrativo</h3>
+            <ul>
+                <li><a href="admin-produtos.html" class="active">Gerenciar Produtos</a></li>
+                <li><a href="clientes.html">Gerenciar Clientes</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px;">
+                <h2>Estoque de Eletrônicos</h2>
+                <button onclick="location.href='form-produto.html'"
+                    style="padding:12px 25px; background:#3399ff; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; transition: 0.3s;">
+                    + CADASTRAR PRODUTO
+                </button>
+            </div>
+
+            <div id="lista-admin" style="background:#1a1a1a; border-radius:8px; border:1px solid #333; overflow: hidden;">
+                <div style="display:flex; justify-content:space-between; padding:15px; background: #222; color:#888; font-size:12px; text-transform:uppercase; letter-spacing: 1px;">
+                    <span>Produto / Preço</span>
+                    <span>Ações</span>
+                </div>
+                <div id="linhas-produtos">
+                    </div>
+            </div>
+        </main>
+
+        <footer class="footer">Sistema Interno Zetta - Acesso Restrito &copy; 2026</footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Exibe nome do admin vindo do auth_check.js
+        document.getElementById('a-name').innerText = user.nome;
+
+        // Função de Logout (caso não esteja no auth_check)
+        function logout() {
+            localStorage.removeItem('user');
+            location.href = 'login.html';
+        }
+
+        // Carrega produtos da API
+        fetchData('produtos.php').then(data => {
+            const div = document.getElementById('linhas-produtos');
+            
+            if (!data || data.length === 0) {
+                div.innerHTML = `<p style="padding: 20px; color: #666; text-align: center;">Nenhum produto cadastrado.</p>`;
+                return;
+            }
+
+            // Limpa a div antes de renderizar (boa prática)
+            div.innerHTML = '';
+
+            data.forEach(p => {
+                // p.imagem aqui já contém a string Base64 (ex: data:image/png;base64,...)
+                div.innerHTML += `
+                <div style="padding:15px; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center; transition: 0.2s;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div style="width:40px; height:40px; background:#000; border-radius:4px; display:flex; align-items:center; justify-content:center; overflow:hidden; border: 1px solid #333;">
+                            <img src="${p.imagem}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://via.placeholder.com/40?text=X'">
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="color:#fff; font-weight: 500;">${p.nome}</span>
+                            <span style="color:#3399ff; font-size: 13px;">R$ ${parseFloat(p.preco).toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <a href="form-produto.html?id=${p.id}" style="color:#3399ff; text-decoration:none; font-weight:bold; font-size:13px; text-transform: uppercase;">Editar</a>
+                        <button onclick="excluir(${p.id})" style="color:#ff4444; border:none; background:none; cursor:pointer; font-weight:bold; font-size:13px; text-transform: uppercase;">Excluir</button>
+                    </div>
+                </div>`;
+            });
+        }).catch(err => {
+            console.error("Erro ao buscar produtos:", err);
+            document.getElementById('linhas-produtos').innerHTML = `<p style="padding: 20px; color: #ff4444; text-align: center;">Erro ao carregar dados.</p>`;
+        });
+
+        // Função para excluir produto
+        async function excluir(id) {
+            if (confirm("⚠️ Tem certeza que deseja excluir este item permanentemente?")) {
+                try {
+                    // Usando o fetchData do seu api.js se ele suportar DELETE, 
+                    // ou mantendo o fetch direto como você fez:
+                    const res = await fetch(`${API_BASE}/produtos.php?id=${id}`, { 
+                        method: 'DELETE' 
+                    });
+                    
+                    const result = await res.json();
+
+                    if (res.ok && result.status === "sucesso") {
+                        alert("✅ Produto removido!");
+                        location.reload();
+                    } else {
+                        alert("❌ Erro ao excluir produto: " + (result.message || "Erro desconhecido"));
+                    }
+                } catch (error) {
+                    alert("❌ Erro de conexão com o servidor.");
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
