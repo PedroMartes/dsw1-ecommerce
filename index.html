@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/global.css">
-    <title>Zetta Store - Eletrônicos</title>
+    <link rel="stylesheet" href="css/catalogo.css"> <title>Zetta Store - Eletrônicos</title>
 </head>
 <body>
     <script src="js/auth_check.js"></script>
@@ -12,8 +12,7 @@
     <div class="container">
         <header class="header">
             <div class="logo">ZETTA</div>
-            <div class="user-info" id="auth-header">
-                </div>
+            <div class="user-info" id="auth-header"></div>
         </header>
 
         <aside class="sidebar">
@@ -26,8 +25,43 @@
         </aside>
 
         <main class="content">
+            <div class="carousel-container">
+                <div class="carousel-slide">
+                    <img src="./images/photo-1550745165-9bc0b252726f.jpeg" alt="Setup Gamer">
+                    <div class="carousel-caption">
+                        <h2>Setups Gamers</h2>
+                        <p>O poder que você precisa para dominar o jogo.</p>
+                    </div>
+                </div>
+
+                <div class="carousel-slide">
+                    <img src="./images/photo-1511707171634-5f897ff02aa9.jpeg" alt="Smartphones">
+                    <div class="carousel-caption">
+                        <h2>Smartphones Premium</h2>
+                        <p>Fotografia e performance na palma da sua mão.</p>
+                    </div>
+                </div>
+
+                <div class="carousel-slide">
+                    <img src="./images/photo-1593642702821-c8da6771f0c6.jpeg" alt="Notebooks">
+                    <div class="carousel-caption">
+                        <h2>Laptops Workstation</h2>
+                        <p>Produtividade máxima onde quer que você esteja.</p>
+                    </div>
+                </div>
+
+                <button class="carousel-btn prev" onclick="moveSlide(-1)">&#10094;</button>
+                <button class="carousel-btn next" onclick="moveSlide(1)">&#10095;</button>
+
+                <div class="dots-container">
+                    <span class="dot" onclick="currentSlide(1)"></span>
+                    <span class="dot" onclick="currentSlide(2)"></span>
+                    <span class="dot" onclick="currentSlide(3)"></span>
+                </div>
+            </div>
+
             <h2>Nossos Produtos</h2>
-            <div id="lista-produtos" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:25px; margin-top:20px;">
+            <div id="lista-produtos">
                 </div>
         </main>
 
@@ -37,41 +71,67 @@
     <script src="js/api.js"></script>
     <script src="js/cart.js"></script>
     <script>
+        // Lógica de Autenticação
         const authHeader = document.getElementById('auth-header');
-        if (user) {
+        if (typeof user !== 'undefined' && user) {
             authHeader.innerHTML = `<span>Olá, ${user.nome}</span> <button onclick="logout()" class="btn-logout">Sair</button>`;
         } else {
             authHeader.innerHTML = `<button onclick="location.href='login.html'" style="background:#3399ff; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">Entrar / Cadastro</button>`;
         }
 
+        // LÓGICA DO CARROSSEL
+        let slideIndex = 1;
+        showSlides(slideIndex);
+
+        function moveSlide(n) {
+            showSlides(slideIndex += n);
+        }
+
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+
+        function showSlides(n) {
+            let i;
+            let slides = document.getElementsByClassName("carousel-slide");
+            let dots = document.getElementsByClassName("dot");
+            if (n > slides.length) {slideIndex = 1}    
+            if (n < 1) {slideIndex = slides.length}
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";  
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+            slides[slideIndex-1].style.display = "block";  
+            dots[slideIndex-1].className += " active";
+        }
+
+        setInterval(() => { moveSlide(1) }, 5000);
+
+        // BUSCA DE PRODUTOS
         fetchData('produtos.php').then(data => {
             const lista = document.getElementById('lista-produtos');
-            
             if (!data || data.length === 0) {
                 lista.innerHTML = "<p style='color:#666;'>Nenhum produto disponível no momento.</p>";
                 return;
             }
 
             data.forEach(p => {
-                // Garante que a imagem tenha o prefixo base64 se não tiver
                 const imgSource = p.imagem.startsWith('data:image') ? p.imagem : `data:image/jpeg;base64,${p.imagem}`;
-                
-                // Objeto para o carrinho (sem a imagem base64 para não sobrecarregar o localStorage)
                 const prodParaCarrinho = { id: p.id, nome: p.nome, preco: p.preco };
                 const prodData = btoa(unescape(encodeURIComponent(JSON.stringify(prodParaCarrinho))));
 
                 lista.innerHTML += `
-                <div class="card" style="text-align:center; transition: 0.3s; border: 1px solid #333; padding: 20px; background: #1a1a1a; border-radius: 8px;">
+                <div class="card">
                     <a href="produto-detalhes.html?id=${p.id}" style="text-decoration:none; display: block;">
-                        <div style="width:100%; height:160px; background:#000; border-radius:4px; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:15px;">
-                            <img src="${imgSource}" style="width:100%; height:100%; object-fit:contain; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                        <div class="card-img-wrapper">
+                            <img src="${imgSource}">
                         </div>
-                        <h4 style="color:white; margin-bottom:10px; height: 40px; overflow: hidden;">${p.nome}</h4>
+                        <h4>${p.nome}</h4>
                     </a>
-                    <p style="color:#3399ff; font-weight:bold; font-size:18px; margin-bottom:15px;">R$ ${parseFloat(p.preco).toFixed(2)}</p>
-                    <button onclick="validarCompra('${prodData}', '${imgSource}')" 
-                        style="width:100%; cursor:pointer; background:#3399ff; color:white; border:none; padding:12px; font-weight:bold; border-radius:4px; transition: 0.2s;" 
-                        onmouseover="this.style.background='#2673c2'" onmouseout="this.style.background='#3399ff'">
+                    <p class="price">R$ ${parseFloat(p.preco).toFixed(2)}</p>
+                    <button onclick="validarCompra('${prodData}', '${imgSource}')" class="btn-buy">
                         Comprar
                     </button>
                 </div>`;
@@ -79,21 +139,21 @@
         });
 
         function validarCompra(encodedData, imgSrc) {
-            if (!user) {
+            if (typeof user === 'undefined' || !user) {
                 alert("Você precisa estar logado para comprar!");
                 window.location.href = 'login.html';
                 return;
             }
-            
             const produto = JSON.parse(decodeURIComponent(escape(atob(encodedData))));
-            produto.imagem = imgSrc; // Reanexa a imagem apenas no momento de enviar ao carrinho
-            
-            // Aqui você chama sua função de cart.js
-            if (typeof addToCart === 'function') {
-                addToCart(produto);
-            } else if (typeof adicionarAoCarrinho === 'function') {
+            produto.imagem = imgSrc;
+            if (typeof adicionarAoCarrinho === 'function') {
                 adicionarAoCarrinho(produto);
             }
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            location.href = 'login.html';
         }
     </script>
 </body>
